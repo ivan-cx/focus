@@ -197,8 +197,29 @@ platform_enumerate_logical_drives :: () -> [] string {
 }
 
 platform_get_save_file_name :: (name := "") -> string, bool {
-    print("name = '%'\n", name);
-    return "", false;
+    path : string;
+    success := false;
+
+    for dir : project_dirs {
+        if dir.path {
+            path = sprint("%/%", dir.path, name);
+            success = true;
+            break;
+        }
+    }
+
+    if !success {
+        home := to_string(getenv("HOME"));
+        if name == ""
+            path = sprint("%/new_file.txt", home);
+        else
+            path = sprint("%/%", home, name);
+        success = true;
+    }
+
+    // TODO:  show a text edit box where path can be changed
+    
+    return path, success;
 }
 
 platform_find_font_by_name :: (name: string, allocator := temp) -> bool, string {
